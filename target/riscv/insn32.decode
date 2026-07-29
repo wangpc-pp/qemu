@@ -203,7 +203,37 @@ srlw     0000000 .....  ..... 101 ..... 0111011 @r
 sraw     0100000 .....  ..... 101 ..... 0111011 @r
 
 # *** RV128I Base Instruction Set (in addition to RV64I) ***
-ldu      ............   ..... 111 ..... 0000011 @i
+#ldu      ............   ..... 111 ..... 0000011 @i
+
+# *** Zilx Extension ***
+# Indexed integer loads on the AMO major opcode.  rs1 is the index, rs2 is the
+# base, and aq/rl must be 0.  funct5 selects the addressing mode and funct3
+# reuses the base-load width/signedness encoding.
+#
+# funct5=10010: unscaled indexed load          (lx)
+lxh         10010 0 0 ..... ..... 001 ..... 0101111 @r
+lxw         10010 0 0 ..... ..... 010 ..... 0101111 @r
+lxd         10010 0 0 ..... ..... 011 ..... 0101111 @r
+lxhu        10010 0 0 ..... ..... 101 ..... 0101111 @r
+lxwu        10010 0 0 ..... ..... 110 ..... 0101111 @r
+
+# funct5=11010: scaled indexed load            (lxs)
+lxsb        11010 0 0 ..... ..... 000 ..... 0101111 @r
+lxsh        11010 0 0 ..... ..... 001 ..... 0101111 @r
+lxsw        11010 0 0 ..... ..... 010 ..... 0101111 @r
+lxsd        11010 0 0 ..... ..... 011 ..... 0101111 @r
+lxsbu       11010 0 0 ..... ..... 100 ..... 0101111 @r
+lxshu       11010 0 0 ..... ..... 101 ..... 0101111 @r
+lxswu       11010 0 0 ..... ..... 110 ..... 0101111 @r
+
+# funct5=11110: scaled load with zero-extended 32-bit index (lxsuw, RV64-only)
+lxsuwb      11110 0 0 ..... ..... 000 ..... 0101111 @r
+lxsuwh      11110 0 0 ..... ..... 001 ..... 0101111 @r
+lxsuww      11110 0 0 ..... ..... 010 ..... 0101111 @r
+lxsuwd      11110 0 0 ..... ..... 011 ..... 0101111 @r
+lxsuwbu     11110 0 0 ..... ..... 100 ..... 0101111 @r
+lxsuwhu     11110 0 0 ..... ..... 101 ..... 0101111 @r
+lxsuwwu     11110 0 0 ..... ..... 110 ..... 0101111 @r
 {
   [
     # *** RV32 Zicbom Standard Extension ***

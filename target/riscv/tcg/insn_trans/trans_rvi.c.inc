@@ -470,11 +470,11 @@ static bool trans_lwu(DisasContext *ctx, arg_lwu *a)
     return gen_load(ctx, a, MO_UL);
 }
 
-static bool trans_ldu(DisasContext *ctx, arg_ldu *a)
-{
-    REQUIRE_128BIT(ctx);
-    return gen_load(ctx, a, MO_UQ);
-}
+// static bool trans_ldu(DisasContext *ctx, arg_ldu *a)
+// {
+//     REQUIRE_128BIT(ctx);
+//     return gen_load(ctx, a, MO_UQ);
+// }
 
 static bool gen_store_tl(DisasContext *ctx, arg_sb *a, MemOp memop)
 {

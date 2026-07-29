@@ -990,6 +990,25 @@ typedef enum {
     rv_op_cbo_flush = 958,
     rv_op_cbo_zero = 959,
     rv_op_mnret = 960,
+    rv_op_lxh       = 961,
+    rv_op_lxw       = 962,
+    rv_op_lxd       = 963,
+    rv_op_lxhu      = 964,
+    rv_op_lxwu      = 965,
+    rv_op_lxsb      = 966,
+    rv_op_lxsh      = 967,
+    rv_op_lxsw      = 968,
+    rv_op_lxsd      = 969,
+    rv_op_lxsbu     = 970,
+    rv_op_lxshu     = 971,
+    rv_op_lxswu     = 972,
+    rv_op_lxsuwb    = 973,
+    rv_op_lxsuwh    = 974,
+    rv_op_lxsuww    = 975,
+    rv_op_lxsuwd    = 976,
+    rv_op_lxsuwbu   = 977,
+    rv_op_lxsuwhu   = 978,
+    rv_op_lxsuwwu   = 979,
 } rv_op;
 
 /* register names */
@@ -2265,6 +2284,25 @@ const rv_opcode_data rvi_opcode_data[] = {
    { "cbo.flush", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "cbo.zero", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "mnret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
+    { "lxh", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxw", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxd", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxhu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxwu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsb", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsh", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsw", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsd", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsbu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxshu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxswu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwb", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwh", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuww", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwd", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwbu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwhu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
+    { "lxsuwwu", rv_codec_r, rv_fmt_rd_base_index, NULL, 0, 0, 0 },
 };
 
 /* CSR names */
@@ -2794,7 +2832,6 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
             case 4: op = rv_op_lbu; break;
             case 5: op = rv_op_lhu; break;
             case 6: op = rv_op_lwu; break;
-            case 7: op = rv_op_ldu; break;
             }
             break;
         case 1:
@@ -3163,6 +3200,26 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
             case 226: op = rv_op_amomaxu_w; break;
             case 227: op = rv_op_amomaxu_d; break;
             case 228: op = rv_op_amomaxu_q; break;
+            /* Zilx indexed loads: funct5 selects the addressing mode. */
+            case 145: op = rv_op_lxh; break;
+            case 146: op = rv_op_lxw; break;
+            case 147: op = rv_op_lxd; break;
+            case 149: op = rv_op_lxhu; break;
+            case 150: op = rv_op_lxwu; break;
+            case 208: op = rv_op_lxsb; break;
+            case 209: op = rv_op_lxsh; break;
+            case 210: op = rv_op_lxsw; break;
+            case 211: op = rv_op_lxsd; break;
+            case 212: op = rv_op_lxsbu; break;
+            case 213: op = rv_op_lxshu; break;
+            case 214: op = rv_op_lxswu; break;
+            case 240: op = rv_op_lxsuwb; break;
+            case 241: op = rv_op_lxsuwh; break;
+            case 242: op = rv_op_lxsuww; break;
+            case 243: op = rv_op_lxsuwd; break;
+            case 244: op = rv_op_lxsuwbu; break;
+            case 245: op = rv_op_lxsuwhu; break;
+            case 246: op = rv_op_lxsuwwu; break;
             }
             break;
         case 12:

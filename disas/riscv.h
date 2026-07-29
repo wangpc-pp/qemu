@@ -235,6 +235,7 @@ enum {
 #define rv_fmt_rd_offset              "O\t0,o"
 #define rv_fmt_rd_uoffset             "O\t0,Uo"
 #define rv_fmt_rd_rs1_rs2             "O\t0,1,2"
+#define rv_fmt_rd_base_index          "O\t0,(2),1"
 #define rv_fmt_frd_rs1                "O\t3,1"
 #define rv_fmt_frd_rs1_rs2            "O\t3,1,2"
 #define rv_fmt_frd_frs1               "O\t3,4"
