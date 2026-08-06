@@ -990,6 +990,10 @@ typedef enum {
     rv_op_cbo_flush = 958,
     rv_op_cbo_zero = 959,
     rv_op_mnret = 960,
+    rv_op_vbcompress_vv = 961,
+    rv_op_vbcompress_vx = 962,
+    rv_op_vbexpand_vv = 963,
+    rv_op_vbexpand_vx = 964,
 } rv_op;
 
 /* register names */
@@ -2265,6 +2269,10 @@ const rv_opcode_data rvi_opcode_data[] = {
    { "cbo.flush", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "cbo.zero", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "mnret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
+    { "vbcompress.vv", rv_codec_v_r, rv_fmt_vd_vs2_vs1_vm, NULL, 0, 0, 0 },
+    { "vbcompress.vx", rv_codec_v_r, rv_fmt_vd_vs2_rs1_vm, NULL, 0, 0, 0 },
+    { "vbexpand.vv", rv_codec_v_r, rv_fmt_vd_vs2_vs1_vm, NULL, 0, 0, 0 },
+    { "vbexpand.vx", rv_codec_v_r, rv_fmt_vd_vs2_rs1_vm, NULL, 0, 0, 0 },
 };
 
 /* CSR names */
@@ -3615,6 +3623,12 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
                 case 47: op = rv_op_vnclip_wv; break;
                 case 48: op = rv_op_vwredsumu_vs; break;
                 case 49: op = rv_op_vwredsum_vs; break;
+                case 50:
+                    op = rv_op_vbcompress_vv;
+                    break;
+                case 51:
+                    op = rv_op_vbexpand_vv;
+                    break;
                 case 53: op = rv_op_vwsll_vv; break;
                 }
                 break;
@@ -3897,6 +3911,12 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
                 case 45: op = rv_op_vnsra_wx; break;
                 case 46: op = rv_op_vnclipu_wx; break;
                 case 47: op = rv_op_vnclip_wx; break;
+                case 50:
+                    op = rv_op_vbcompress_vx;
+                    break;
+                case 51:
+                    op = rv_op_vbexpand_vx;
+                    break;
                 case 53: op = rv_op_vwsll_vx; break;
                 }
                 break;

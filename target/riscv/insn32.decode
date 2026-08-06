@@ -1084,3 +1084,9 @@ sb_aqrl  00111 . . ..... ..... 000 ..... 0101111 @atom_st
 sh_aqrl  00111 . . ..... ..... 001 ..... 0101111 @atom_st
 sw_aqrl  00111 . . ..... ..... 010 ..... 0101111 @atom_st
 sd_aqrl  00111 . . ..... ..... 011 ..... 0101111 @atom_st
+
+# *** Zvbext Vector Bit Compress and Expand Extension ***
+vbcompress_vv 110010 . ..... ..... 000 ..... 1010111 @r_vm
+vbcompress_vx 110010 . ..... ..... 100 ..... 1010111 @r_vm
+vbexpand_vv   110011 . ..... ..... 000 ..... 1010111 @r_vm
+vbexpand_vx   110011 . ..... ..... 100 ..... 1010111 @r_vm

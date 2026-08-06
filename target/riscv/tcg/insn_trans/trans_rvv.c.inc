@@ -4079,3 +4079,18 @@ GEN_INT_EXT_TRANS(vzext_vf8, 3, 2)
 GEN_INT_EXT_TRANS(vsext_vf2, 1, 3)
 GEN_INT_EXT_TRANS(vsext_vf4, 2, 4)
 GEN_INT_EXT_TRANS(vsext_vf8, 3, 5)
+
+/* Zvbext Vector Bit Compress and Expand Extension */
+#define GEN_ZVBEXT_CHECK(NAME, CHECK_FN)               \
+static bool NAME(DisasContext *s, arg_rmrr *a)         \
+{                                                      \
+    return s->cfg_ptr->ext_zvbext && CHECK_FN(s, a);   \
+}
+
+GEN_ZVBEXT_CHECK(zvbext_vv_check, opivv_check)
+GEN_ZVBEXT_CHECK(zvbext_vx_check, opivx_check)
+
+GEN_OPIVV_TRANS(vbcompress_vv, zvbext_vv_check)
+GEN_OPIVX_TRANS(vbcompress_vx, zvbext_vx_check)
+GEN_OPIVV_TRANS(vbexpand_vv, zvbext_vv_check)
+GEN_OPIVX_TRANS(vbexpand_vx, zvbext_vx_check)
