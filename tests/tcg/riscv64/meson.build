@@ -17,6 +17,10 @@ tests += {
     'cflags': ['-nostdlib'],
     'qemu_args': ['-cpu', 'rv64,c=false'],
   },
+  'test-zvbec.c': {
+    'cflags': ['-march=rv64gcv'],
+    'qemu_args': ['-cpu', 'max,zvbec=true'],
+  },
 }
 
 if 'qemu-riscv64' in emulators

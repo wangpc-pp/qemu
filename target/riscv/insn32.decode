@@ -1097,3 +1097,9 @@ vwabda_vv     111101 . ..... ..... 000 ..... 1010111 @r_vm
 vwabda_vx     111101 . ..... ..... 100 ..... 1010111 @r_vm
 vwabdau_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
 vwabdau_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
+
+# *** Zvbec Vector Bit Compress and Expand Extension ***
+vbcompress_vv 110010 . ..... ..... 000 ..... 1010111 @r_vm
+vbcompress_vx 110010 . ..... ..... 100 ..... 1010111 @r_vm
+vbexpand_vv   110011 . ..... ..... 000 ..... 1010111 @r_vm
+vbexpand_vx   110011 . ..... ..... 100 ..... 1010111 @r_vm

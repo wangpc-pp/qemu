@@ -1379,6 +1379,23 @@ DEF_HELPER_6(vwabdau_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
 DEF_HELPER_6(vwabdau_vx_b, void, ptr, ptr, tl, ptr, env, i32)
 DEF_HELPER_6(vwabdau_vx_h, void, ptr, ptr, tl, ptr, env, i32)
 
+DEF_HELPER_6(vbcompress_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbcompress_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vbexpand_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+
 /* CFI (zicfiss) helpers */
 #ifndef CONFIG_USER_ONLY
 DEF_HELPER_1(ssamoswap_disabled, void, env)

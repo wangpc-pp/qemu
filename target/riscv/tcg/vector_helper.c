@@ -5967,3 +5967,75 @@ GEN_VEXT_VV(vwabdau_vv_b, 2)
 GEN_VEXT_VV(vwabdau_vv_h, 4)
 GEN_VEXT_VX(vwabdau_vx_b, 2)
 GEN_VEXT_VX(vwabdau_vx_h, 4)
+
+/* Zvbec Vector Bit Compress and Expand Extension */
+static uint64_t vbcompress(uint64_t value, uint64_t mask)
+{
+    uint64_t result = 0;
+    uint64_t result_bit = 1;
+
+    while (mask) {
+        uint64_t mask_bit = mask & -mask;
+
+        if (value & mask_bit) {
+            result |= result_bit;
+        }
+        mask &= mask - 1;
+        result_bit <<= 1;
+    }
+    return result;
+}
+
+static uint64_t vbexpand(uint64_t value, uint64_t mask)
+{
+    uint64_t result = 0;
+    uint64_t value_bit = 1;
+
+    while (mask) {
+        uint64_t mask_bit = mask & -mask;
+
+        if (value & value_bit) {
+            result |= mask_bit;
+        }
+        mask &= mask - 1;
+        value_bit <<= 1;
+    }
+    return result;
+}
+
+#define DO_VBCOMPRESS(N, M) vbcompress(N, M)
+#define DO_VBEXPAND(N, M) vbexpand(N, M)
+
+RVVCALL(OPIVV2, vbcompress_vv_b, OP_UUU_B, H1, H1, H1, DO_VBCOMPRESS)
+RVVCALL(OPIVV2, vbcompress_vv_h, OP_UUU_H, H2, H2, H2, DO_VBCOMPRESS)
+RVVCALL(OPIVV2, vbcompress_vv_w, OP_UUU_W, H4, H4, H4, DO_VBCOMPRESS)
+RVVCALL(OPIVV2, vbcompress_vv_d, OP_UUU_D, H8, H8, H8, DO_VBCOMPRESS)
+RVVCALL(OPIVX2, vbcompress_vx_b, OP_UUU_B, H1, H1, DO_VBCOMPRESS)
+RVVCALL(OPIVX2, vbcompress_vx_h, OP_UUU_H, H2, H2, DO_VBCOMPRESS)
+RVVCALL(OPIVX2, vbcompress_vx_w, OP_UUU_W, H4, H4, DO_VBCOMPRESS)
+RVVCALL(OPIVX2, vbcompress_vx_d, OP_UUU_D, H8, H8, DO_VBCOMPRESS)
+RVVCALL(OPIVV2, vbexpand_vv_b, OP_UUU_B, H1, H1, H1, DO_VBEXPAND)
+RVVCALL(OPIVV2, vbexpand_vv_h, OP_UUU_H, H2, H2, H2, DO_VBEXPAND)
+RVVCALL(OPIVV2, vbexpand_vv_w, OP_UUU_W, H4, H4, H4, DO_VBEXPAND)
+RVVCALL(OPIVV2, vbexpand_vv_d, OP_UUU_D, H8, H8, H8, DO_VBEXPAND)
+RVVCALL(OPIVX2, vbexpand_vx_b, OP_UUU_B, H1, H1, DO_VBEXPAND)
+RVVCALL(OPIVX2, vbexpand_vx_h, OP_UUU_H, H2, H2, DO_VBEXPAND)
+RVVCALL(OPIVX2, vbexpand_vx_w, OP_UUU_W, H4, H4, DO_VBEXPAND)
+RVVCALL(OPIVX2, vbexpand_vx_d, OP_UUU_D, H8, H8, DO_VBEXPAND)
+
+GEN_VEXT_VV(vbcompress_vv_b, 1)
+GEN_VEXT_VV(vbcompress_vv_h, 2)
+GEN_VEXT_VV(vbcompress_vv_w, 4)
+GEN_VEXT_VV(vbcompress_vv_d, 8)
+GEN_VEXT_VX(vbcompress_vx_b, 1)
+GEN_VEXT_VX(vbcompress_vx_h, 2)
+GEN_VEXT_VX(vbcompress_vx_w, 4)
+GEN_VEXT_VX(vbcompress_vx_d, 8)
+GEN_VEXT_VV(vbexpand_vv_b, 1)
+GEN_VEXT_VV(vbexpand_vv_h, 2)
+GEN_VEXT_VV(vbexpand_vv_w, 4)
+GEN_VEXT_VV(vbexpand_vv_d, 8)
+GEN_VEXT_VX(vbexpand_vx_b, 1)
+GEN_VEXT_VX(vbexpand_vx_h, 2)
+GEN_VEXT_VX(vbexpand_vx_w, 4)
+GEN_VEXT_VX(vbexpand_vx_d, 8)

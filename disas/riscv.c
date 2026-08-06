@@ -2030,6 +2030,8 @@ static const rv_opcode_data *decode_inst_opcode(rv_decode *dec, rv_isa isa)
                 case 47: return &op_vnclip_wv;
                 case 48: return &op_vwredsumu_vs;
                 case 49: return &op_vwredsum_vs;
+                case 50: return &op_vbcompress_vv;
+                case 51: return &op_vbexpand_vv;
                 case 53: return &op_vwsll_vv;
                 case 61: return &op_vwabda_vv;
                 case 62: return &op_vwabdau_vv;
@@ -2361,6 +2363,8 @@ static const rv_opcode_data *decode_inst_opcode(rv_decode *dec, rv_isa isa)
                 case 45: return &op_vnsra_wx;
                 case 46: return &op_vnclipu_wx;
                 case 47: return &op_vnclip_wx;
+                case 50: return &op_vbcompress_vx;
+                case 51: return &op_vbexpand_vx;
                 case 53: return &op_vwsll_vx;
                 case 61: return &op_vwabda_vx;
                 case 62: return &op_vwabdau_vx;

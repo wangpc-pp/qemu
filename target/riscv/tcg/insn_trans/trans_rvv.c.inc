@@ -4136,3 +4136,18 @@ GEN_ABD_OPIVV_WIDEN_TRANS(vwabda_vv, vwabd_vv_check)
 GEN_ABD_OPIVX_WIDEN_TRANS(vwabda_vx, vwabd_vx_check)
 GEN_ABD_OPIVV_WIDEN_TRANS(vwabdau_vv, vwabd_vv_check)
 GEN_ABD_OPIVX_WIDEN_TRANS(vwabdau_vx, vwabd_vx_check)
+
+/* Zvbec Vector Bit Compress and Expand Extension */
+#define GEN_ZVBEC_CHECK(NAME, CHECK_FN)                    \
+static bool NAME(DisasContext *s, arg_rmrr *a)              \
+{                                                        \
+    return s->cfg_ptr->ext_zvbec && CHECK_FN(s, a);         \
+}
+
+GEN_ZVBEC_CHECK(zvbec_vv_check, opivv_check)
+GEN_ZVBEC_CHECK(zvbec_vx_check, opivx_check)
+
+GEN_OPIVV_TRANS(vbcompress_vv, zvbec_vv_check)
+GEN_OPIVX_TRANS(vbcompress_vx, zvbec_vx_check)
+GEN_OPIVV_TRANS(vbexpand_vv, zvbec_vv_check)
+GEN_OPIVX_TRANS(vbexpand_vx, zvbec_vx_check)
