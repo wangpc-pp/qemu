@@ -2047,6 +2047,45 @@ GEN_OPIVI_TRANS(vmsle_vi, IMM_SX, vmsle_vx, opivx_cmp_check)
 GEN_OPIVI_TRANS(vmsgtu_vi, IMM_SX, vmsgtu_vx, opivx_cmp_check)
 GEN_OPIVI_TRANS(vmsgt_vi, IMM_SX, vmsgt_vx, opivx_cmp_check)
 
+static bool trans_vmmatch_vx(DisasContext *s, arg_rmrr *a)
+{
+    if (require_rvv(s) &&
+        s->cfg_ptr->ext_zvmatch &&
+        s->sew <= MO_16 &&
+        vext_check_isa_ill(s) &&
+        vext_check_ms(s, a->rd, a->rs2) &&
+        require_vm(a->vm, a->rs2)) {
+        static gen_helper_opivx * const fns[2] = {
+            gen_helper_vmmatch_vx_b,
+            gen_helper_vmmatch_vx_h,
+        };
+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);
+    }
+    return false;
+}
+
+static bool trans_vmmatch_vv(DisasContext *s, arg_rmrr *a)
+{
+    int group_size = 1 << MAX(s->lmul, 0);
+
+    if (require_rvv(s) &&
+        s->cfg_ptr->ext_zvmatch &&
+        s->sew <= MO_16 &&
+        vext_check_isa_ill(s) &&
+        vext_check_ms(s, a->rd, a->rs2) &&
+        require_align(a->rs1, s->lmul) &&
+        require_vm(a->vm, a->rs1) &&
+        require_vm(a->vm, a->rs2) &&
+        !is_overlapped(a->rd, 1, a->rs1, group_size)) {
+        static gen_helper_gvec_4_ptr * const fns[2] = {
+            gen_helper_vmmatch_vv_b,
+            gen_helper_vmmatch_vv_h,
+        };
+        return opivv_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);
+    }
+    return false;
+}
+
 /* Vector Integer Min/Max Instructions */
 GEN_OPIVV_GVEC_TRANS(vminu_vv, umin)
 GEN_OPIVV_GVEC_TRANS(vmin_vv,  smin)

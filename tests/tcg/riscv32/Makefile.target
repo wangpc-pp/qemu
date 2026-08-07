@@ -1,0 +1,9 @@
+# -*- Mode: makefile -*-
+# RISC-V 32-bit specific tests
+
+VPATH += $(SRC_PATH)/tests/tcg/riscv32
+
+TESTS += test-zvmatch
+test-zvmatch: CFLAGS += -march=rv32gcv -mabi=ilp32
+test-zvmatch: LDFLAGS += -nostdlib -static -Wl,-e,_start
+run-test-zvmatch: QEMU_OPTS += -cpu max,zvmatch=true,rvv_ma_all_1s=true,rvv_ta_all_1s=true

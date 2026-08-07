@@ -1623,6 +1623,94 @@ GEN_VEXT_CMP_VX(vmsgt_vx_h, int16_t, H2, DO_MSGT)
 GEN_VEXT_CMP_VX(vmsgt_vx_w, int32_t, H4, DO_MSGT)
 GEN_VEXT_CMP_VX(vmsgt_vx_d, int64_t, H8, DO_MSGT)
 
+/* Experimental Zvmatch Extension */
+#define GEN_VEXT_VMMATCH_VX(NAME, ETYPE, H)                         \
+void HELPER(NAME)(void *vd, void *v0, target_ulong keys, void *vs2, \
+                  CPURISCVState *env, uint32_t desc)                \
+{                                                                   \
+    uint32_t vm = vext_vm(desc);                                    \
+    uint32_t vl = env->vl;                                          \
+    uint32_t total_elems = riscv_cpu_cfg(env)->vlenb << 3;          \
+    uint32_t vta_all_1s = vext_vta_all_1s(desc);                    \
+    uint32_t vma = vext_vma(desc);                                  \
+    uint32_t slots = sizeof(target_ulong) * 8 / (sizeof(ETYPE) * 8);\
+    uint32_t i;                                                     \
+                                                                    \
+    VSTART_CHECK_EARLY_EXIT(env, vl);                               \
+                                                                    \
+    for (i = env->vstart; i < vl; i++) {                            \
+        ETYPE query = *((ETYPE *)vs2 + H(i));                       \
+        bool match = false;                                         \
+                                                                    \
+        if (!vm && !vext_elem_mask(v0, i)) {                        \
+            if (vma) {                                              \
+                vext_set_elem_mask(vd, i, 1);                       \
+            }                                                       \
+            continue;                                               \
+        }                                                           \
+        for (uint32_t j = 0; j < slots; j++) {                      \
+            ETYPE key = keys >> (j * sizeof(ETYPE) * 8);            \
+                                                                    \
+            if (query == key) {                                     \
+                match = true;                                       \
+                break;                                              \
+            }                                                       \
+        }                                                           \
+        vext_set_elem_mask(vd, i, match);                           \
+    }                                                               \
+    env->vstart = 0;                                                \
+    if (vta_all_1s) {                                               \
+        for (; i < total_elems; i++) {                              \
+            vext_set_elem_mask(vd, i, 1);                           \
+        }                                                           \
+    }                                                               \
+}
+
+#define GEN_VEXT_VMMATCH_VV(NAME, ETYPE, H)                         \
+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,         \
+                  CPURISCVState *env, uint32_t desc)                \
+{                                                                   \
+    uint32_t vm = vext_vm(desc);                                    \
+    uint32_t vl = env->vl;                                          \
+    uint32_t vlmax = vext_max_elems(desc, ctzl(sizeof(ETYPE)));     \
+    uint32_t total_elems = riscv_cpu_cfg(env)->vlenb << 3;          \
+    uint32_t vta_all_1s = vext_vta_all_1s(desc);                    \
+    uint32_t vma = vext_vma(desc);                                  \
+    uint32_t i;                                                     \
+                                                                    \
+    VSTART_CHECK_EARLY_EXIT(env, vl);                               \
+                                                                    \
+    for (i = env->vstart; i < vl; i++) {                            \
+        ETYPE query = *((ETYPE *)vs2 + H(i));                       \
+        bool match = false;                                         \
+                                                                    \
+        if (!vm && !vext_elem_mask(v0, i)) {                        \
+            if (vma) {                                              \
+                vext_set_elem_mask(vd, i, 1);                       \
+            }                                                       \
+            continue;                                               \
+        }                                                           \
+        for (uint32_t j = 0; j < vlmax; j++) {                      \
+            if (query == *((ETYPE *)vs1 + H(j))) {                  \
+                match = true;                                       \
+                break;                                              \
+            }                                                       \
+        }                                                           \
+        vext_set_elem_mask(vd, i, match);                           \
+    }                                                               \
+    env->vstart = 0;                                                \
+    if (vta_all_1s) {                                               \
+        for (; i < total_elems; i++) {                              \
+            vext_set_elem_mask(vd, i, 1);                           \
+        }                                                           \
+    }                                                               \
+}
+
+GEN_VEXT_VMMATCH_VX(vmmatch_vx_b, uint8_t, H1)
+GEN_VEXT_VMMATCH_VX(vmmatch_vx_h, uint16_t, H2)
+GEN_VEXT_VMMATCH_VV(vmmatch_vv_b, uint8_t, H1)
+GEN_VEXT_VMMATCH_VV(vmmatch_vv_h, uint16_t, H2)
+
 /* Vector Integer Min/Max Instructions */
 RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
 RVVCALL(OPIVV2, vminu_vv_h, OP_UUU_H, H2, H2, H2, DO_MIN)

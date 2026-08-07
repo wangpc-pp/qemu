@@ -18,3 +18,7 @@ TESTS += test-fcvtmod
 test-fcvtmod: CFLAGS += -march=rv64imafdc
 test-fcvtmod: LDFLAGS += -static
 run-test-fcvtmod: QEMU_OPTS += -cpu rv64,d=true,zfa=true
+
+TESTS += test-zvmatch
+test-zvmatch: CFLAGS += -march=rv64gcv
+run-test-zvmatch: QEMU_OPTS += -cpu max,zvmatch=true,rvv_ma_all_1s=true,rvv_ta_all_1s=true

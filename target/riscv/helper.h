@@ -473,6 +473,11 @@ DEF_HELPER_6(vmsgt_vx_h, void, ptr, ptr, tl, ptr, env, i32)
 DEF_HELPER_6(vmsgt_vx_w, void, ptr, ptr, tl, ptr, env, i32)
 DEF_HELPER_6(vmsgt_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 
+DEF_HELPER_6(vmmatch_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vmmatch_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+DEF_HELPER_6(vmmatch_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+DEF_HELPER_6(vmmatch_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+
 DEF_HELPER_6(vminu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
 DEF_HELPER_6(vminu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
 DEF_HELPER_6(vminu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
