@@ -5475,6 +5475,103 @@ GEN_VEXT_VID_V(vid_v_w, uint32_t, H4)
 GEN_VEXT_VID_V(vid_v_d, uint64_t, H8)
 
 /*
+ * Vector Conflict Detection Instructions (Zvcd)
+ *
+ * vconflictcnt.v vd, vs2, vm
+ *   For each active lane i, vd[i] is the number of active lanes j (0 <= j <= i)
+ *   whose SEW-bit value equals vs2[i].  An active lane always matches itself,
+ *   so the 1-based rank is at least 1.  Only SEW=32 and SEW=64 are legal.
+ */
+#define GEN_VEXT_VCONFLICTCNT_V(NAME, ETYPE, H)                           \
+void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
+                  uint32_t desc)                                          \
+{                                                                         \
+    uint32_t vm = vext_vm(desc);                                          \
+    uint32_t vl = env->vl;                                                \
+    uint32_t esz = sizeof(ETYPE);                                         \
+    uint32_t total_elems = vext_get_total_elems(env, desc, esz);          \
+    uint32_t vta = vext_vta(desc);                                        \
+    uint32_t vma = vext_vma(desc);                                        \
+    int i, j;                                                             \
+                                                                          \
+    VSTART_CHECK_EARLY_EXIT(env, vl);                                     \
+                                                                          \
+    for (i = env->vstart; i < vl; i++) {                                  \
+        if (!vm && !vext_elem_mask(v0, i)) {                              \
+            /* inactive body element follows vma */                       \
+            vext_set_elems_1s(vd, vma, i * esz, (i + 1) * esz);           \
+            continue;                                                     \
+        }                                                                 \
+        ETYPE count = 0;                                                  \
+        for (j = 0; j <= i; j++) {                                        \
+            if ((vm || vext_elem_mask(v0, j)) &&                          \
+                *((ETYPE *)vs2 + H(j)) == *((ETYPE *)vs2 + H(i))) {       \
+                count++;                                                  \
+            }                                                             \
+        }                                                                 \
+        *((ETYPE *)vd + H(i)) = count;                                    \
+    }                                                                     \
+    env->vstart = 0;                                                      \
+    /* set tail elements to 1s */                                         \
+    vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);              \
+}
+
+GEN_VEXT_VCONFLICTCNT_V(vconflictcnt_v_w, uint32_t, H4)
+GEN_VEXT_VCONFLICTCNT_V(vconflictcnt_v_d, uint64_t, H8)
+
+/*
+ * vconflictlast.m vd, vs2, vm
+ *   For each active lane i, the destination mask bit is 1 iff no higher-index
+ *   active lane equals vs2[i], i.e. lane i is the highest-index lane of its
+ *   equal-value active group.  The destination is a mask register (EEW=1).
+ */
+#define GEN_VEXT_VCONFLICTLAST_M(NAME, ETYPE, H)                          \
+void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
+                  uint32_t desc)                                          \
+{                                                                         \
+    uint32_t vm = vext_vm(desc);                                          \
+    uint32_t vl = env->vl;                                                \
+    uint32_t total_elems = riscv_cpu_cfg(env)->vlenb << 3;                \
+    uint32_t vta_all_1s = vext_vta_all_1s(desc);                          \
+    uint32_t vma = vext_vma(desc);                                        \
+    int i, j;                                                             \
+                                                                          \
+    VSTART_CHECK_EARLY_EXIT(env, vl);                                     \
+                                                                          \
+    for (i = env->vstart; i < vl; i++) {                                  \
+        if (!vm && !vext_elem_mask(v0, i)) {                              \
+            /* inactive body mask bit follows vma */                      \
+            if (vma) {                                                    \
+                vext_set_elem_mask(vd, i, 1);                             \
+            }                                                             \
+            continue;                                                     \
+        }                                                                 \
+        bool has_later_equal = false;                                     \
+        for (j = i + 1; j < vl; j++) {                                    \
+            if ((vm || vext_elem_mask(v0, j)) &&                          \
+                *((ETYPE *)vs2 + H(j)) == *((ETYPE *)vs2 + H(i))) {       \
+                has_later_equal = true;                                   \
+                break;                                                    \
+            }                                                             \
+        }                                                                 \
+        vext_set_elem_mask(vd, i, !has_later_equal);                      \
+    }                                                                     \
+    env->vstart = 0;                                                      \
+    /*                                                                    \
+     * mask destination register is always tail-agnostic;                 \
+     * set tail elements to 1s                                            \
+     */                                                                   \
+    if (vta_all_1s) {                                                     \
+        for (; i < total_elems; i++) {                                    \
+            vext_set_elem_mask(vd, i, 1);                                 \
+        }                                                                 \
+    }                                                                     \
+}
+
+GEN_VEXT_VCONFLICTLAST_M(vconflictlast_m_w, uint32_t, H4)
+GEN_VEXT_VCONFLICTLAST_M(vconflictlast_m_d, uint64_t, H8)
+
+/*
  * Vector Permutation Instructions
  */
 

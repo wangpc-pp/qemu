@@ -990,6 +990,8 @@ typedef enum {
     rv_op_cbo_flush = 958,
     rv_op_cbo_zero = 959,
     rv_op_mnret = 960,
+    rv_op_vconflictcnt_v = 961,
+    rv_op_vconflictlast_m = 962,
 } rv_op;
 
 /* register names */
@@ -2265,6 +2267,8 @@ const rv_opcode_data rvi_opcode_data[] = {
    { "cbo.flush", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "cbo.zero", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "mnret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
+    { "vconflictcnt.v", rv_codec_v_r, rv_fmt_vd_vs2_vm, NULL, 0, 0, 0 },
+    { "vconflictlast.m", rv_codec_v_r, rv_fmt_vd_vs2_vm, NULL, 0, 0, 0 },
 };
 
 /* CSR names */
@@ -3743,12 +3747,14 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
                     case 1: op = rv_op_vmsbf_m;  break;
                     case 2: op = rv_op_vmsof_m; break;
                     case 3: op = rv_op_vmsif_m; break;
+                    case 4: op = rv_op_vconflictlast_m; break;
                     case 16: op = rv_op_viota_m; break;
                     case 17:
                         if (((inst >> 20) & 0b11111) == 0) {
                             op = rv_op_vid_v;
                         }
                         break;
+                    case 18: op = rv_op_vconflictcnt_v; break;
                     }
                     break;
                 case 23: if ((inst >> 25) & 1) op = rv_op_vcompress_vm; break;
