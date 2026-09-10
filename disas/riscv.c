@@ -1558,6 +1558,31 @@ static const rv_opcode_data *decode_inst_opcode(rv_decode *dec, rv_isa isa)
             case 162: return &op_amomax_w;
             case 163: return &op_amomax_d;
             case 164: return &op_amomax_q;
+            case 176:
+                if (extract32(inst, 7, 5) == extract32(inst, 15, 5) &&
+                    extract32(inst, 15, 5) != 0) {
+                    return &op_spi_b;
+                }
+                break;
+            case 177:
+                if (extract32(inst, 7, 5) == extract32(inst, 15, 5) &&
+                    extract32(inst, 15, 5) != 0) {
+                    return &op_spi_h;
+                }
+                break;
+            case 178:
+                if (extract32(inst, 7, 5) == extract32(inst, 15, 5) &&
+                    extract32(inst, 15, 5) != 0) {
+                    return &op_spi_w;
+                }
+                break;
+            case 179:
+                if (isa != rv32 &&
+                    extract32(inst, 7, 5) == extract32(inst, 15, 5) &&
+                    extract32(inst, 15, 5) != 0) {
+                    return &op_spi_d;
+                }
+                break;
             case 192: return &op_amominu_b;
             case 193: return &op_amominu_h;
             case 194: return &op_amominu_w;

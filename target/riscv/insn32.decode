@@ -263,6 +263,13 @@ ssamoswap_w 01001 . . ..... ..... 010 ..... 0101111 @atom_st
 amoadd_w   00000 . . ..... ..... 010 ..... 0101111 @atom_st
 amoxor_w   00100 . . ..... ..... 010 ..... 0101111 @atom_st
 amoand_w   01100 . . ..... ..... 010 ..... 0101111 @atom_st
+
+# *** Zispi Extension ***
+# Unit-stride post-increment stores. rd must equal rs1 and must not be x0.
+spi_b       10110 0 0 ..... ..... 000 ..... 0101111 @r
+spi_h       10110 0 0 ..... ..... 001 ..... 0101111 @r
+spi_w       10110 0 0 ..... ..... 010 ..... 0101111 @r
+spi_d       10110 0 0 ..... ..... 011 ..... 0101111 @r
 amoor_w    01000 . . ..... ..... 010 ..... 0101111 @atom_st
 amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
 amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st

@@ -21,6 +21,7 @@ tests += {
     'cflags': ['-nostdlib'],
     'qemu_args': ['-cpu', 'rv64,c=false'],
   },
+  'test-zispi.c': {'qemu_args': ['-cpu', 'max,zispi=on']},
 }
 
 if 'qemu-riscv64' in emulators
