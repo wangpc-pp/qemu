@@ -725,8 +725,8 @@ void riscv_cpu_validate_set_extensions(RISCVCPU *cpu, Error **errp)
         return;
     }
 
-    if (cpu->cfg.ext_zvmatch && !riscv_has_ext(env, RVV)) {
-        error_setg(errp, "Zvmatch extension requires V extension");
+    if (cpu->cfg.ext_zvmatch && !cpu->cfg.ext_zve32x) {
+        error_setg(errp, "Zvmatch extension requires Zve32x extension");
         return;
     }
 

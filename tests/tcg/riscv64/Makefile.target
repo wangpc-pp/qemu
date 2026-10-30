@@ -22,3 +22,17 @@ run-test-fcvtmod: QEMU_OPTS += -cpu rv64,d=true,zfa=true
 TESTS += test-zvmatch
 test-zvmatch: CFLAGS += -march=rv64gcv
 run-test-zvmatch: QEMU_OPTS += -cpu max,zvmatch=true,rvv_ma_all_1s=true,rvv_ta_all_1s=true
+
+ZVMATCH_POLICIES = zvmatch=true$(COMMA)rvv_ma_all_1s=true$(COMMA)rvv_ta_all_1s=true
+ZVMATCH_SMALL_CPU = max$(COMMA)v=false$(COMMA)elen=32$(COMMA)zve64x=false$(COMMA)zve64f=false$(COMMA)zve64d=false$(COMMA)zvbc=false$(COMMA)zvknhb=false
+EXTRA_RUNS += run-test-zvmatch-vlen32 run-test-zvmatch-vlen64
+run-test-zvmatch-vlen32: test-zvmatch
+	$(call run-test, $<, $(QEMU) -cpu $(ZVMATCH_SMALL_CPU)$(COMMA)vlen=32$(COMMA)$(ZVMATCH_POLICIES) $(QEMU_OPTS) $<)
+run-test-zvmatch-vlen64: test-zvmatch
+	$(call run-test, $<, $(QEMU) -cpu $(ZVMATCH_SMALL_CPU)$(COMMA)vlen=64$(COMMA)$(ZVMATCH_POLICIES) $(QEMU_OPTS) $<)
+
+EXTRA_RUNS += run-test-zvmatch-vlen256 run-test-zvmatch-vlen512
+run-test-zvmatch-vlen256: test-zvmatch
+	$(call run-test, $<, $(QEMU) -cpu max$(COMMA)vlen=256$(COMMA)$(ZVMATCH_POLICIES) $(QEMU_OPTS) $<)
+run-test-zvmatch-vlen512: test-zvmatch
+	$(call run-test, $<, $(QEMU) -cpu max$(COMMA)vlen=512$(COMMA)$(ZVMATCH_POLICIES) $(QEMU_OPTS) $<)

@@ -2064,22 +2064,22 @@ static bool trans_vmmatch_vx(DisasContext *s, arg_rmrr *a)
     return false;
 }
 
-static bool trans_vmmatch_vv(DisasContext *s, arg_rmrr *a)
+static bool trans_vmmatch_vs(DisasContext *s, arg_rmrr *a)
 {
-    int group_size = 1 << MAX(s->lmul, 0);
+    int key_emul = MAX(16 / s->cfg_ptr->vlenb, 1);
 
     if (require_rvv(s) &&
         s->cfg_ptr->ext_zvmatch &&
         s->sew <= MO_16 &&
         vext_check_isa_ill(s) &&
         vext_check_ms(s, a->rd, a->rs2) &&
-        require_align(a->rs1, s->lmul) &&
+        require_align(a->rs1, ctz32(key_emul)) &&
         require_vm(a->vm, a->rs1) &&
         require_vm(a->vm, a->rs2) &&
-        !is_overlapped(a->rd, 1, a->rs1, group_size)) {
+        !is_overlapped(a->rd, 1, a->rs1, key_emul)) {
         static gen_helper_gvec_4_ptr * const fns[2] = {
-            gen_helper_vmmatch_vv_b,
-            gen_helper_vmmatch_vv_h,
+            gen_helper_vmmatch_vs_b,
+            gen_helper_vmmatch_vs_h,
         };
         return opivv_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);
     }

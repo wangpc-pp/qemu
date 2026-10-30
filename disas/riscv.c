@@ -990,7 +990,7 @@ typedef enum {
     rv_op_cbo_flush = 958,
     rv_op_cbo_zero = 959,
     rv_op_mnret = 960,
-    rv_op_vmmatch_vv = 961,
+    rv_op_vmmatch_vs = 961,
     rv_op_vmmatch_vx = 962,
 } rv_op;
 
@@ -2267,7 +2267,7 @@ const rv_opcode_data rvi_opcode_data[] = {
    { "cbo.flush", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "cbo.zero", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
    { "mnret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-    { "vmmatch.vv", rv_codec_v_r, rv_fmt_vd_vs2_vs1_vm, NULL, 0, 0, 0 },
+    { "vmmatch.vs", rv_codec_v_r, rv_fmt_vd_vs2_vs1_vm, NULL, 0, 0, 0 },
     { "vmmatch.vx", rv_codec_v_r, rv_fmt_vd_vs2_rs1_vm, NULL, 0, 0, 0 },
 };
 
@@ -3620,7 +3620,7 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
                 case 48: op = rv_op_vwredsumu_vs; break;
                 case 49: op = rv_op_vwredsum_vs; break;
                 case 52:
-                    op = rv_op_vmmatch_vv;
+                    op = rv_op_vmmatch_vs;
                     break;
                 case 53: op = rv_op_vwsll_vv; break;
                 }

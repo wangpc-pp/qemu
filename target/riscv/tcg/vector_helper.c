@@ -1666,13 +1666,13 @@ void HELPER(NAME)(void *vd, void *v0, target_ulong keys, void *vs2, \
     }                                                               \
 }
 
-#define GEN_VEXT_VMMATCH_VV(NAME, ETYPE, H)                         \
+#define GEN_VEXT_VMMATCH_VS(NAME, ETYPE, H)                         \
 void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,         \
                   CPURISCVState *env, uint32_t desc)                \
 {                                                                   \
     uint32_t vm = vext_vm(desc);                                    \
     uint32_t vl = env->vl;                                          \
-    uint32_t vlmax = vext_max_elems(desc, ctzl(sizeof(ETYPE)));     \
+    uint32_t keys = 16 / sizeof(ETYPE);                              \
     uint32_t total_elems = riscv_cpu_cfg(env)->vlenb << 3;          \
     uint32_t vta_all_1s = vext_vta_all_1s(desc);                    \
     uint32_t vma = vext_vma(desc);                                  \
@@ -1690,7 +1690,7 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,         \
             }                                                       \
             continue;                                               \
         }                                                           \
-        for (uint32_t j = 0; j < vlmax; j++) {                      \
+        for (uint32_t j = 0; j < keys; j++) {                       \
             if (query == *((ETYPE *)vs1 + H(j))) {                  \
                 match = true;                                       \
                 break;                                              \
@@ -1708,8 +1708,8 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,         \
 
 GEN_VEXT_VMMATCH_VX(vmmatch_vx_b, uint8_t, H1)
 GEN_VEXT_VMMATCH_VX(vmmatch_vx_h, uint16_t, H2)
-GEN_VEXT_VMMATCH_VV(vmmatch_vv_b, uint8_t, H1)
-GEN_VEXT_VMMATCH_VV(vmmatch_vv_h, uint16_t, H2)
+GEN_VEXT_VMMATCH_VS(vmmatch_vs_b, uint8_t, H1)
+GEN_VEXT_VMMATCH_VS(vmmatch_vs_h, uint16_t, H2)
 
 /* Vector Integer Min/Max Instructions */
 RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
