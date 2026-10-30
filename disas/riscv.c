@@ -1307,6 +1307,16 @@ static const rv_opcode_data *decode_inst_opcode(rv_decode *dec, rv_isa isa)
                    case 4: return &op_cbo_zero;
                    }
                }
+                break;
+            case 3:
+                if (isa != rv128 && (!dec->cfg || dec->cfg->ext_zimemops)) {
+                    switch (extract32(inst, 25, 7)) {
+                    case 0: return &op_mcopy;
+                    case 3: return &op_mmove;
+                    case 6: return &op_mset;
+                    }
+                }
+                break;
             }
             break;
         case 4:

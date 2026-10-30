@@ -178,6 +178,91 @@ static void check_zicbo_envcfg(CPURISCVState *env, target_ulong envbits,
 #endif
 }
 
+#ifndef CONFIG_USER_ONLY
+static void zimemops_check_memory(CPURISCVState *env, target_ulong addr,
+                                  MMUAccessType access_type, int mmu_idx,
+                                  uintptr_t ra)
+{
+    CPUTLBEntryFull *full;
+    void *host;
+
+    probe_access_full(env, addr, 1, access_type, mmu_idx, false,
+                      &host, &full, ra);
+    /* Inspect the actual mapping, even when plugins force slow accesses. */
+    if (full->slow_flags[access_type] & (TLB_MMIO | TLB_DISCARD_WRITE)) {
+        env->badaddr = addr;
+        env->two_stage_lookup = mmuidx_2stage(mmu_idx);
+        env->two_stage_indirect_lookup = false;
+        riscv_raise_exception(env, access_type == MMU_DATA_LOAD ?
+                              RISCV_EXCP_LOAD_ACCESS_FAULT :
+                              RISCV_EXCP_STORE_AMO_ACCESS_FAULT, ra);
+    }
+}
+#endif
+
+void HELPER(zimemops)(CPURISCVState *env, uint32_t insn)
+{
+    CPUState *cs = env_cpu(env);
+    int rd = extract32(insn, 7, 5);
+    int rs1 = extract32(insn, 15, 5);
+    int rs2 = extract32(insn, 20, 5);
+    int op = extract32(insn, 25, 7);
+    int mmu_idx = riscv_env_mmu_index(env, false);
+    uintptr_t ra = GETPC();
+    bool rv32 = env->xl == MXL_RV32;
+    target_ulong mask = rv32 ? UINT32_MAX : (target_ulong)-1;
+    target_ulong dest = env->gpr[rd] & mask;
+    target_ulong src = env->gpr[rs1] & mask;
+    target_ulong remaining = env->gpr[rs2] & mask;
+    bool fill = op == 6;
+    bool backward = op == 3 && dest > src;
+
+    while (remaining) {
+        target_ulong offset = backward ? remaining - 1 : 0;
+        target_ulong daddr = (dest + offset) & mask;
+        target_ulong saddr = (src + offset) & mask;
+        uint8_t byte = src;
+
+        if (cpu_address_xl(env) == MXL_RV32) {
+            daddr = (uint32_t)daddr;
+            saddr = (uint32_t)saddr;
+        }
+        daddr = adjust_addr(env, daddr);
+        if (!fill) {
+            saddr = adjust_addr(env, saddr);
+#ifndef CONFIG_USER_ONLY
+            zimemops_check_memory(env, saddr, MMU_DATA_LOAD, mmu_idx, ra);
+#endif
+            byte = cpu_ldub_mmuidx_ra(env, saddr, mmu_idx, ra);
+        }
+#ifndef CONFIG_USER_ONLY
+        zimemops_check_memory(env, daddr, MMU_DATA_STORE, mmu_idx, ra);
+#endif
+        if (env_archcpu(env)->cfg.ext_ztso) {
+            /* Match the ordering of an ordinary Ztso byte store. */
+            smp_mb();
+        }
+        cpu_stb_mmuidx_ra(env, daddr, byte, mmu_idx, ra);
+
+        /* A byte contributes progress only after its store succeeds. */
+        if (!backward) {
+            dest = (dest + 1) & mask;
+            env->gpr[rd] = rv32 ? (int32_t)dest : dest;
+            if (!fill) {
+                src = (src + 1) & mask;
+                env->gpr[rs1] = rv32 ? (int32_t)src : src;
+            }
+        }
+        remaining--;
+        env->gpr[rs2] = rv32 ? (int32_t)remaining : remaining;
+
+        /* Unwind to this instruction without retiring partial work. */
+        if (remaining && unlikely(cpu_loop_exit_requested(cs))) {
+            cpu_loop_exit_restore(cs, ra);
+        }
+    }
+}
+
 void HELPER(cbo_zero)(CPURISCVState *env, target_ulong address)
 {
     RISCVCPU *cpu = env_archcpu(env);

@@ -16,9 +16,21 @@ qemu_args = ['-M', 'virt',
              '-bios']
 
 tests += {
+  '../riscv64/test-zimemops.S': {
+    'cflags': cflags + ['-DCHECK_INSTRET'],
+    'qemu_args': ['-cpu', 'rv32,x-zimemops=true', '-icount', 'shift=1', qemu_args],
+  },
   'test-mcycle.S': {
     'cflags': cflags,
     'qemu_args': ['-icount', 'shift=1', qemu_args],
+  },
+}
+
+tests += {
+  '../riscv64/test-zimemops.S': {
+    'exe_name': 'test-zimemops-disabled',
+    'cflags': cflags + ['-DZIMEMOPS_DISABLED'],
+    'qemu_args': ['-cpu', 'rv32,x-zimemops=false', qemu_args],
   },
 }
 

@@ -21,6 +21,10 @@ tests += {
   'interruptedmemory.S': setup + {'plugin_test': {'plugin': 'discons'}},
   'issue1060.S': setup,
   'test-mepc-masking.S': setup,
+  'test-zimemops.S': setup + {
+    'cflags': cflags + ['-DCHECK_INSTRET'],
+    'qemu_args': ['-cpu', 'rv64,x-zimemops=true', '-icount', 'shift=1', qemu_args],
+  },
   'test-crc32.S': setup + {'qemu_args': ['-cpu', 'rv64,xlrbr=true', qemu_args]},
   'test-minstret-ecall.S': setup + {'qemu_args': ['-icount', 'shift=1', qemu_args]},
   'test-minstret-wfi.S': setup + {'qemu_args': ['-icount', 'shift=1', qemu_args]},
@@ -29,6 +33,14 @@ tests += {
   'test-vsepc-masking.S': setup + {
     'test_name': 'test-vsepc-masking-c',
     'qemu_args': ['-cpu', 'rv64,h=true,c=true', qemu_args],
+  },
+}
+
+tests += {
+  'test-zimemops.S': {
+    'exe_name': 'test-zimemops-disabled',
+    'cflags': cflags + ['-DZIMEMOPS_DISABLED'],
+    'qemu_args': ['-cpu', 'rv64,x-zimemops=false', qemu_args],
   },
 }
 
