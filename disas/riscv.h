@@ -98,6 +98,7 @@ typedef enum {
     rv_codec_i_csr,
     rv_codec_s,
     rv_codec_sb,
+    rv_codec_sb_sh6,
     rv_codec_r,
     rv_codec_r_m,
     rv_codec_r4_m,
@@ -237,6 +238,7 @@ typedef struct {
 #define rv_fmt_rs2_offset_rs1         "O\t2,i(1)"
 #define rv_fmt_frs2_offset_rs1        "O\t5,i(1)"
 #define rv_fmt_rs1_rs2_offset         "O\t1,2,o"
+#define rv_fmt_rs1_imm1_offset        "O\t1,j,o"
 #define rv_fmt_rs2_rs1_offset         "O\t2,1,o"
 #define rv_fmt_aqrl_rd_rs2_rs1        "OAR\t0,2,(1)"
 #define rv_fmt_aqrl_rd_rs1            "OAR\t0,(1)"

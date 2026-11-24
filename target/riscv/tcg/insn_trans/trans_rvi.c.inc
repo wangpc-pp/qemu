@@ -266,24 +266,9 @@ static void gen_setcond_i128(TCGv rl, TCGv rh,
     tcg_gen_movi_tl(rh, 0);
 }
 
-static bool gen_branch(DisasContext *ctx, arg_b *a, TCGCond cond)
+static bool gen_branch_target(DisasContext *ctx, TCGLabel *l, int imm)
 {
-    TCGLabel *l = gen_new_label();
-    TCGv src1 = get_gpr(ctx, a->rs1, EXT_SIGN);
-    TCGv src2 = get_gpr(ctx, a->rs2, EXT_SIGN);
     target_ulong orig_pc_save = ctx->pc_save;
-
-    if (get_xl(ctx) == MXL_RV128) {
-        TCGv src1h = get_gprh(ctx, a->rs1);
-        TCGv src2h = get_gprh(ctx, a->rs2);
-        TCGv tmp = tcg_temp_new();
-
-        cond = gen_compare_i128(a->rs2 == 0,
-                                tmp, src1, src1h, src2, src2h, cond);
-        tcg_gen_brcondi_tl(cond, tmp, 0, l);
-    } else {
-        tcg_gen_brcond_tl(cond, src1, src2, l);
-    }
 
 #ifndef CONFIG_USER_ONLY
     if (ctx->cfg_ptr->ext_smctr || ctx->cfg_ptr->ext_ssctr) {
@@ -305,10 +290,10 @@ static bool gen_branch(DisasContext *ctx, arg_b *a, TCGCond cond)
     if (!riscv_cpu_allow_16bit_insn(ctx->cfg_ptr,
                                     ctx->priv_ver,
                                     ctx->misa_ext) &&
-        (a->imm & 0x3)) {
+        (imm & 0x3)) {
         /* misaligned */
         TCGv target_pc = tcg_temp_new();
-        gen_pc_plus_diff(target_pc, ctx, a->imm);
+        gen_pc_plus_diff(target_pc, ctx, imm);
         gen_exception_inst_addr_mis(ctx, target_pc);
     } else {
 #ifndef CONFIG_USER_ONLY
@@ -318,16 +303,37 @@ static bool gen_branch(DisasContext *ctx, arg_b *a, TCGCond cond)
             TCGv src = tcg_temp_new();
 
             gen_pc_plus_diff(src, ctx, 0);
-            gen_pc_plus_diff(dest, ctx, a->imm);
+            gen_pc_plus_diff(dest, ctx, imm);
             gen_helper_ctr_add_entry(tcg_env, src, dest, type);
         }
 #endif
-        gen_goto_tb(ctx, 0, a->imm);
+        gen_goto_tb(ctx, 0, imm);
     }
     ctx->pc_save = -1;
     ctx->base.is_jmp = DISAS_NORETURN;
 
     return true;
+}
+
+static bool gen_branch(DisasContext *ctx, arg_b *a, TCGCond cond)
+{
+    TCGLabel *l = gen_new_label();
+    TCGv src1 = get_gpr(ctx, a->rs1, EXT_SIGN);
+    TCGv src2 = get_gpr(ctx, a->rs2, EXT_SIGN);
+
+    if (get_xl(ctx) == MXL_RV128) {
+        TCGv src1h = get_gprh(ctx, a->rs1);
+        TCGv src2h = get_gprh(ctx, a->rs2);
+        TCGv tmp = tcg_temp_new();
+
+        cond = gen_compare_i128(a->rs2 == 0,
+                                tmp, src1, src1h, src2, src2h, cond);
+        tcg_gen_brcondi_tl(cond, tmp, 0, l);
+    } else {
+        tcg_gen_brcond_tl(cond, src1, src2, l);
+    }
+
+    return gen_branch_target(ctx, l, a->imm);
 }
 
 static bool trans_beq(DisasContext *ctx, arg_beq *a)

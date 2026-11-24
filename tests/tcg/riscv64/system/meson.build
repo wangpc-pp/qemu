@@ -89,6 +89,37 @@ tests += {
 }
 
 if 'qemu-system-riscv64' in emulators
+  foreach compressed : [false, true]
+    zibs_cpu = ('rv64,x-zibs=true,c=' +
+                (compressed ? 'true' : 'false,zca=false'))
+    zibs_setup = {
+      'cflags': cflags + ['-march=rv64im_zicsr', '-mabi=lp64'] +
+                (compressed ? ['-DZIBS_COMPRESSED'] : []),
+      'qemu_args': ['-cpu', zibs_cpu, qemu_args],
+    }
+    if compressed
+      zibs_setup += {'exe_name': 'test-zibs-c'}
+    endif
+    tests += {
+      'test-zibs.S': zibs_setup,
+    }
+  endforeach
+  tests += {
+    'test-zibs.S': {
+      'exe_name': 'test-zibs-disabled',
+      'cflags': cflags + ['-march=rv64im_zicsr', '-mabi=lp64',
+                        '-DZIBS_DISABLED'],
+      'qemu_args': ['-cpu', 'rv64,x-zibs=false', qemu_args],
+    },
+  }
+  tests += {
+    'test-zibs.S': {
+      'exe_name': 'test-zibs-disabled',
+      'test_name': 'test-zibs-default',
+      'qemu_args': ['-cpu', 'rv64', qemu_args],
+    },
+  }
+
   tcg_tests += {
     'riscv64-softmmu': {
       'cc': 'riscv64-linux-gnu-gcc',

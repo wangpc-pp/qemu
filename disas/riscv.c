@@ -2511,6 +2511,14 @@ static const rv_opcode_data *decode_inst_opcode(rv_decode *dec, rv_isa isa)
         case 25:
             switch ((inst >> 12) & 0b111) {
             case 0: return &op_jalr;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                if (isa == rv64 || (isa == rv32 && !(inst & (1 << 13)))) {
+                    return inst & (1 << 12) ? &op_bbseti : &op_bbclri;
+                }
+                break;
             }
             break;
         case 27: return &op_jal;
@@ -2753,6 +2761,12 @@ static void decode_inst_operands(rv_decode *dec, rv_isa isa,
         dec->rs1 = operand_rs1(inst);
         dec->rs2 = operand_rs2(inst);
         dec->imm = operand_sbimm12(inst);
+        break;
+    case rv_codec_sb_sh6:
+        dec->rd = dec->rs2 = rv_ireg_zero;
+        dec->rs1 = operand_rs1(inst);
+        dec->imm = operand_sbimm12(inst);
+        dec->imm1 = ((inst >> 8) & 0x20) | operand_rs2(inst);
         break;
     case rv_codec_r:
         dec->rd = operand_rd(inst);
